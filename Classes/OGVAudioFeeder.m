@@ -21,8 +21,8 @@
 
 @end
 
-static const int nBuffers = 3;
-static const int circularBufferSize = 8192 * 16;
+static const int nBuffers = 2;
+static const int circularBufferSize = 3200 * 16;
 
 typedef OSStatus (^OSStatusWrapperBlock)(void);
 
