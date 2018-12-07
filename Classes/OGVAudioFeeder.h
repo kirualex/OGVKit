@@ -9,6 +9,7 @@
 @interface OGVAudioFeeder : NSObject
 
 @property (readonly) OGVAudioFormat *format;
+@property UInt8 status; // 0 is OK
 
 /**
  * Initializer!

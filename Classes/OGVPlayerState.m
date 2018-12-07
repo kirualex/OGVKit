@@ -309,6 +309,9 @@
     assert(!audioFeeder);
 
     audioFeeder = [[OGVAudioFeeder alloc] initWithFormat:decoder.audioFormat];
+    if (audioFeeder.status != 0) {
+        NSLog(@"OGVAudioFeederAudioQueueException");
+    }
 
     // Reset to audio clock
     initTime = self.baseTime;
