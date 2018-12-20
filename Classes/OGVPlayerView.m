@@ -15,8 +15,9 @@
 //  - requires extra pixel format conversions
 //  - image isn't retained when app goes into background
 //  - 4:4:4 doesn't output at all on device
+//  - weird offset bug at 640x360 on iPad Pro
 //
-#define USE_LAYER 1
+//#define USE_LAYER 1
 
 static NSString *kOGVPlayerTimeLabelEmpty = @"-:--";
 

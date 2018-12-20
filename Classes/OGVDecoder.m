@@ -13,24 +13,24 @@
 
 #pragma mark - stubs for subclasses to implement
 
-- (BOOL)dequeueFrame
+- (BOOL)decodeFrame
 {
     return NO;
 }
 
-- (BOOL)dequeueAudio
+- (BOOL)decodeAudio
 {
     return NO;
 }
 
-- (BOOL)decodeFrameWithBlock:(void (^)(OGVVideoBuffer *))block
+- (OGVVideoBuffer *)frameBuffer
 {
-    return NO;
+    return nil;
 }
 
-- (BOOL)decodeAudioWithBlock:(void (^)(OGVAudioBuffer *))block
+- (OGVAudioBuffer *)audioBuffer
 {
-    return NO;
+    return nil;
 }
 
 - (BOOL)process
@@ -41,11 +41,6 @@
 - (BOOL)seek:(float)seconds
 {
     return NO;
-}
-
-- (float)findNextKeyframe
-{
-    return INFINITY;
 }
 
 #pragma mark - stub property getters

@@ -186,9 +186,9 @@
                         [self play];
                     } else if (self->decoder.hasVideo) {
                         // Show where we left off
-                        [self->decoder decodeFrameWithBlock:^(OGVVideoBuffer *frameBuffer) {
-                            [self drawFrame:frameBuffer];
-                        }];
+                        if ([self->decoder decodeFrame]) {
+                            [self drawFrame];
+                        }
                     }
                 }
             });
@@ -309,9 +309,6 @@
     assert(!audioFeeder);
 
     audioFeeder = [[OGVAudioFeeder alloc] initWithFormat:decoder.audioFormat];
-    if (audioFeeder.status != 0) {
-        NSLog(@"OGVAudioFeederAudioQueueException");
-    }
 
     // Reset to audio clock
     initTime = self.baseTime;
@@ -405,19 +402,6 @@
         
         // See if the frame timestamp is behind the playhead
         BOOL readyToDecodeFrame = (frameDelay <= 0.0);
-
-        // If we get behind audio, and there's a keyframe we can pick up on, skip to it.
-        if (frameEndTimestamp < playbackPosition) {
-            float nextKeyframe = [decoder findNextKeyframe];
-            if (nextKeyframe > decoder.frameTimestamp && nextKeyframe < playbackPosition) {
-                [OGVKit.singleton.logger debugWithFormat:@"behind by %f; skipping to next keyframe %f", frameDelay, nextKeyframe];
-                while (decoder.frameReady && decoder.frameTimestamp < nextKeyframe) {
-                    [decoder dequeueFrame];
-                }
-                frameEndTimestamp = decoder.frameTimestamp;
-                continue;
-            }
-        }
         
         
         if (decoder.hasAudio) {
@@ -441,20 +425,20 @@
                 BOOL readyForAudio = (audioBufferedDuration <= bufferDuration);
 
                 if (readyForAudio) {
-                    BOOL ok = [decoder decodeAudioWithBlock:^(OGVAudioBuffer *audioBuffer) {
-                        if (![self->audioFeeder bufferData:audioBuffer]) {
-                            if ([self->audioFeeder isClosed]) {
+                    BOOL ok = [decoder decodeAudio];
+                    if (ok) {
+                        OGVAudioBuffer *audioBuffer = [decoder audioBuffer];
+                        if (![audioFeeder bufferData:audioBuffer]) {
+                            if ([audioFeeder isClosed]) {
                                 // Audio died, perhaps due to starvation during slow decodes
                                 // or something else unexpected. Close it out and we'll start
                                 // up a new one.
                                 [OGVKit.singleton.logger debugWithFormat:@"CLOSING OUT CLOSED AUDIO FEEDER"];
                                 [self stopAudio];
                                 [self startAudio:audioTimestamp];
-                                [self->audioFeeder bufferData:audioBuffer];
+                                [audioFeeder bufferData:audioBuffer];
                             }
                         }
-                    }];
-                    if (ok) {
                         // Go back around the loop in case we need more
                         continue;
                     } else {
@@ -479,12 +463,12 @@
         if (decoder.hasVideo) {
             if (decoder.frameReady) {
                 if (readyToDecodeFrame) {
-                    BOOL ok = [decoder decodeFrameWithBlock:^(OGVVideoBuffer *frameBuffer) {
+                    BOOL ok = [decoder decodeFrame];
+                    if (ok) {
                         // Check if it's time to draw (AKA the frame timestamp is at or past the playhead)
                         // If we're already playing, DRAW!
-                        [self drawFrame:frameBuffer];
-                    }];
-                    if (ok) {
+                        [self drawFrame];
+
                         // End the processing loop, we'll ping again after drawing
                         //return;
                     } else {
@@ -529,12 +513,13 @@
 /**
  * Dequeue frame and schedule a frame draw on the main thread
  */
--(void)drawFrame:(OGVVideoBuffer *)frameBuffer
+-(void)drawFrame
 {
-    frameEndTimestamp = frameBuffer.timestamp;
+    OGVVideoBuffer *buffer = decoder.frameBuffer;
+    frameEndTimestamp = buffer.timestamp;
     // Note: this must be sync because memory may belong to the decoder!
     [self callDelegateSelector:@selector(ogvPlayerState:drawFrame:) sync:YES withBlock:^() {
-        [self->delegate ogvPlayerState:self drawFrame:frameBuffer];
+        [self->delegate ogvPlayerState:self drawFrame:buffer];
     }];
 }
 
@@ -549,14 +534,14 @@
         }
         if (exact) {
             if (decoder.hasAudio && decoder.audioReady && decoder.audioTimestamp < target) {
-                [decoder decodeAudioWithBlock:^(OGVAudioBuffer *audioBuffer) {
+                if ([decoder decodeAudio]) {
                     // no-op
-                }];
+                }
             }
             if (decoder.hasVideo && decoder.frameReady && decoder.frameTimestamp < target) {
-                [decoder decodeFrameWithBlock:^(OGVVideoBuffer *frameBuffer) {
+                if ([decoder decodeFrame]) {
                     // no-op
-                }];
+                }
             }
             if ((!decoder.hasVideo || decoder.frameTimestamp >= target) &&
                 (!decoder.hasAudio || decoder.audioTimestamp >= target)) {

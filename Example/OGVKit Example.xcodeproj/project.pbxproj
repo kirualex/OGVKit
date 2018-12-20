@@ -13,8 +13,6 @@
 		D42B38491CD7B17500529092 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D42B38471CD7B17500529092 /* InfoPlist.strings */; };
 		D42B384C1CD7B17B00529092 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D42B384A1CD7B17B00529092 /* Main.storyboard */; };
 		D43498031E03864700085E6E /* kitty-short.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = D43498021E03864700085E6E /* kitty-short.mp4 */; };
-		D463DE111E43FD8A00EDFA49 /* OGVEncodingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D463DE101E43FD8A00EDFA49 /* OGVEncodingViewController.m */; };
-		D463DE131E4400EB00EDFA49 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D463DE121E4400EB00EDFA49 /* MobileCoreServices.framework */; };
 		D474D5BD1CD7AFFE00D8BBE3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D474D5AD1CD7AFFE00D8BBE3 /* Images.xcassets */; };
 		D474D5BE1CD7AFFE00D8BBE3 /* Launch Screen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D474D5AE1CD7AFFE00D8BBE3 /* Launch Screen.xib */; };
 		D474D5BF1CD7AFFE00D8BBE3 /* OGVAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D474D5B01CD7AFFE00D8BBE3 /* OGVAppDelegate.m */; };
@@ -30,7 +28,6 @@
 		D4C009871E12148E0002D6F3 /* hacking-444.ogv in Resources */ = {isa = PBXBuildFile; fileRef = D4C009841E12148E0002D6F3 /* hacking-444.ogv */; };
 		D4D8E6A61DEFE0B20020F1A6 /* bunny.webm in Resources */ = {isa = PBXBuildFile; fileRef = D4D8E6A51DEFE0B20020F1A6 /* bunny.webm */; };
 		D4F61F651CD7ADAD00898F7F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D4F61F641CD7ADAD00898F7F /* main.m */; };
-		D4FC1C35202669B9008D9DDE /* OGVMediaExampleItem.m in Sources */ = {isa = PBXBuildFile; fileRef = D4FC1C34202669B9008D9DDE /* OGVMediaExampleItem.m */; };
 		DD8A506FD85F5A250221726A /* bunny_opus_vp8.webm in Resources */ = {isa = PBXBuildFile; fileRef = DD8A56AF7A230FD69EAC33A9 /* bunny_opus_vp8.webm */; };
 		DD8A5A9E0C27E70ED811521D /* bunny_opus_vp9.webm in Resources */ = {isa = PBXBuildFile; fileRef = DD8A5464BF31D7D7528F738C /* bunny_opus_vp9.webm */; };
 /* End PBXBuildFile section */
@@ -55,9 +52,6 @@
 		D42B38481CD7B17500529092 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D42B384B1CD7B17B00529092 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D43498021E03864700085E6E /* kitty-short.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = "kitty-short.mp4"; path = "Samples/kitty-short.mp4"; sourceTree = SOURCE_ROOT; };
-		D463DE0F1E43FD8A00EDFA49 /* OGVEncodingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OGVEncodingViewController.h; sourceTree = "<group>"; };
-		D463DE101E43FD8A00EDFA49 /* OGVEncodingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OGVEncodingViewController.m; sourceTree = "<group>"; };
-		D463DE121E4400EB00EDFA49 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		D474D5AD1CD7AFFE00D8BBE3 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		D474D5AE1CD7AFFE00D8BBE3 /* Launch Screen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "Launch Screen.xib"; sourceTree = "<group>"; };
 		D474D5AF1CD7AFFE00D8BBE3 /* OGVAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OGVAppDelegate.h; sourceTree = "<group>"; };
@@ -84,8 +78,6 @@
 		D4F61F641CD7ADAD00898F7F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D4F61F741CD7ADAD00898F7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4F61F791CD7ADAD00898F7F /* OGVKit Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OGVKit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D4FC1C33202669B9008D9DDE /* OGVMediaExampleItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OGVMediaExampleItem.h; sourceTree = "<group>"; };
-		D4FC1C34202669B9008D9DDE /* OGVMediaExampleItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OGVMediaExampleItem.m; sourceTree = "<group>"; };
 		DD8A5464BF31D7D7528F738C /* bunny_opus_vp9.webm */ = {isa = PBXFileReference; lastKnownFileType = file.webm; name = bunny_opus_vp9.webm; path = Samples/bunny_opus_vp9.webm; sourceTree = SOURCE_ROOT; };
 		DD8A56AF7A230FD69EAC33A9 /* bunny_opus_vp8.webm */ = {isa = PBXFileReference; lastKnownFileType = file.webm; name = bunny_opus_vp8.webm; path = Samples/bunny_opus_vp8.webm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -95,7 +87,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D463DE131E4400EB00EDFA49 /* MobileCoreServices.framework in Frameworks */,
 				4D59E30BF54DDE9CCFFD9D02 /* Pods_OGVKit_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -114,7 +105,6 @@
 		7016D2F53EB12107BE8CD805 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D463DE121E4400EB00EDFA49 /* MobileCoreServices.framework */,
 				A7C3D9A2848BAFADE8CD1F89 /* Pods_OGVKit_Example.framework */,
 				15293075762407D432DDD467 /* Pods_OGVKit_Tests.framework */,
 			);
@@ -180,12 +170,8 @@
 				D474D5BA1CD7AFFE00D8BBE3 /* OGVViewController.m */,
 				D4F61F741CD7ADAD00898F7F /* Info.plist */,
 				D4F61F631CD7ADAD00898F7F /* Supporting Files */,
-				D463DE0F1E43FD8A00EDFA49 /* OGVEncodingViewController.h */,
-				D463DE101E43FD8A00EDFA49 /* OGVEncodingViewController.m */,
 				DD8A56AF7A230FD69EAC33A9 /* bunny_opus_vp8.webm */,
 				DD8A5464BF31D7D7528F738C /* bunny_opus_vp9.webm */,
-				D4FC1C33202669B9008D9DDE /* OGVMediaExampleItem.h */,
-				D4FC1C34202669B9008D9DDE /* OGVMediaExampleItem.m */,
 			);
 			path = "OGVKit Example";
 			sourceTree = "<group>";
@@ -220,6 +206,7 @@
 				D4F61F5D1CD7ADAC00898F7F /* Frameworks */,
 				D4F61F5E1CD7ADAC00898F7F /* Resources */,
 				C9204C917B1F00D234526E4E /* [CP] Embed Pods Frameworks */,
+				5591F1C6635D2A54630693F6 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -238,6 +225,8 @@
 				D4F61F751CD7ADAD00898F7F /* Sources */,
 				D4F61F761CD7ADAD00898F7F /* Frameworks */,
 				D4F61F771CD7ADAD00898F7F /* Resources */,
+				006856319B8410E95E6EC09B /* [CP] Embed Pods Frameworks */,
+				3629D3AAF3736F18FF11CDF4 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -260,8 +249,7 @@
 				TargetAttributes = {
 					D4F61F5F1CD7ADAC00898F7F = {
 						CreatedOnToolsVersion = 7.3;
-						DevelopmentTeam = 7LBY3ZCYK9;
-						LastSwiftMigration = 0920;
+						DevelopmentTeam = ZAMD7Q9KYY;
 					};
 					D4F61F781CD7ADAD00898F7F = {
 						CreatedOnToolsVersion = 7.3;
@@ -320,6 +308,51 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		006856319B8410E95E6EC09B /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-OGVKit Tests/Pods-OGVKit Tests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3629D3AAF3736F18FF11CDF4 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-OGVKit Tests/Pods-OGVKit Tests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5591F1C6635D2A54630693F6 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-OGVKit Example/Pods-OGVKit Example-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		8F88E7EA12DBABE6B51C9A47 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -346,7 +379,6 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-OGVKit Example/Pods-OGVKit Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/OGVKit/OGVKit.framework",
-				"${PODS_ROOT}/WebM/WebM.framework",
 				"${BUILT_PRODUCTS_DIR}/libnestegg/nestegg.framework",
 				"${BUILT_PRODUCTS_DIR}/libogg/ogg.framework",
 				"${BUILT_PRODUCTS_DIR}/liboggz/oggz.framework",
@@ -358,7 +390,6 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OGVKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebM.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nestegg.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ogg.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/oggz.framework",
@@ -397,8 +428,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D463DE111E43FD8A00EDFA49 /* OGVEncodingViewController.m in Sources */,
-				D4FC1C35202669B9008D9DDE /* OGVMediaExampleItem.m in Sources */,
 				D4F61F651CD7ADAD00898F7F /* main.m in Sources */,
 				D474D5C01CD7AFFE00D8BBE3 /* OGVCommonsExampleItem.m in Sources */,
 				D474D5C11CD7AFFE00D8BBE3 /* OGVExampleItem.m in Sources */,
@@ -556,20 +585,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 7LBY3ZCYK9;
+				DEVELOPMENT_TEAM = ZAMD7Q9KYY;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "OGVKit Example/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.brionv.OGVKit-Example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -579,19 +604,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 7LBY3ZCYK9;
+				DEVELOPMENT_TEAM = ZAMD7Q9KYY;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "OGVKit Example/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.brionv.OGVKit-Example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

@@ -37,19 +37,18 @@
 
 @property (readonly) BOOL audioReady;
 @property (readonly) float audioTimestamp;
+@property (readonly) OGVAudioBuffer *audioBuffer;
 
 @property (readonly) BOOL frameReady;
 @property (readonly) float frameTimestamp;
+@property (readonly) OGVVideoBuffer *frameBuffer;
 
 @property OGVInputStream *inputStream;
 
 - (BOOL)process;
-- (BOOL)dequeueFrame;
-- (BOOL)dequeueAudio;
-- (BOOL)decodeFrameWithBlock:(void (^)(OGVVideoBuffer *frameBuffer))block;
-- (BOOL)decodeAudioWithBlock:(void (^)(OGVAudioBuffer *audioBuffer))block;
+- (BOOL)decodeFrame;
+- (BOOL)decodeAudio;
 - (BOOL)seek:(float)seconds;
-- (float)findNextKeyframe;
 
 + (BOOL)canPlayType:(OGVMediaType *)mediaType;
 

@@ -145,7 +145,7 @@
     if (ret != 0) {
         @throw [NSException
                 exceptionWithName:@"OGVVideoBufferException"
-                reason:[NSString stringWithFormat:@"Failed to create CMVideoFormatDescription %d", (int)ret]
+                reason:[NSString stringWithFormat:@"Failed to create CMVideoFormatDescription %d", ret]
                 userInfo:@{@"CMReturn": @(ret)}];
         return NULL;
     }
@@ -160,7 +160,7 @@
     if (ret != 0) {
         @throw [NSException
                 exceptionWithName:@"OGVVideoBufferException"
-                reason:[NSString stringWithFormat:@"Failed to create CMSampleBuffer %d", (int)ret]
+                reason:[NSString stringWithFormat:@"Failed to create CMSampleBuffer %d", ret]
                 userInfo:@{@"CMReturn": @(ret)}];
     }
     
@@ -318,29 +318,24 @@
         // Interleave blocks of 16 pixels...
         const int skip = width & ~0xf;
         for (int x = 0; x < skip; x += 16) {
-            const uint8x16x4_t tmp = {
+            const uint8x16x3_t tmp = {
                 .val = {
-                    {255, 255, 255, 255,
-                     255, 255, 255, 255,
-                     255, 255, 255, 255,
-                     255, 255, 255, 255},
                     vld1q_u8(lumaIn + x),
                     vld1q_u8(chromaCbIn + x),
                     vld1q_u8(chromaCrIn + x)
                 }
             };
-            vst4q_u8(pixelOut + x * 4, tmp);
+            vst3q_u8(pixelOut + x * 3, tmp);
         }
 #else
         const int skip = 0;
 #endif
         // Interleave anything that's left
         for (int x = skip; x < width; x++) {
-            const int x4 = x * 4;
-            pixelOut[x4] = 255; // alpha
-            pixelOut[x4 + 1] = lumaIn[x];
-            pixelOut[x4 + 2] = chromaCbIn[x];
-            pixelOut[x4 + 3] = chromaCrIn[x];
+            const int x3 = x * 3;
+            pixelOut[x3] = lumaIn[x];
+            pixelOut[x3 + 1] = chromaCbIn[x];
+            pixelOut[x3 + 2] = chromaCrIn[x];
         }
         lumaIn += lumaInStride;
         chromaCbIn += chromaCbInStride;

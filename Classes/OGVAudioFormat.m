@@ -20,20 +20,4 @@
     return self;
 }
 
-- (BOOL)isEqual:(id)object
-{
-    if (!object) {
-        return NO;
-    }
-    if ([object class] != [self class]) {
-        return NO;
-    }
-    if (self == object) {
-        return YES;
-    }
-    OGVAudioFormat *other = object;
-    return (self.channels == other.channels) &&
-           (self.sampleRate == other.sampleRate);
-}
-
 @end

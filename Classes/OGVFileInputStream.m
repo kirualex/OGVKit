@@ -57,8 +57,6 @@
         self.mediaType = [[OGVMediaType alloc] initWithString:@"audio/mp4"];
     } else if ([ext isEqualToString:@"m4v"]) {
         self.mediaType = [[OGVMediaType alloc] initWithString:@"video/mp4"];
-    } else if ([ext isEqualToString:@"mov"]) {
-        self.mediaType = [[OGVMediaType alloc] initWithString:@"video/mp4"];
     }
 
     file = fopen([self.URL.path UTF8String], "rb");
@@ -129,7 +127,7 @@
 -(void)seek:(int64_t)offset blocking:(BOOL)blocking
 {
     // @todo support non-blocking reads from local filesystem
-    fseeko(file, offset, SEEK_SET);
+    fseek(file, offset, SEEK_SET);
     self.bytePosition = offset;
     self.state = OGVInputStreamStateReading;
 }

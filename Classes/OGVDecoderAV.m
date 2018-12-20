@@ -26,6 +26,8 @@
 
     OGVQueue *audioBuffers;
     OGVQueue *frameBuffers;
+    OGVAudioBuffer *queuedAudio;
+    OGVVideoBuffer *queuedFrame;
 }
 
 + (void)load
@@ -53,33 +55,20 @@
     return self;
 }
 
-
-- (BOOL)dequeueFrame
-{
-    OGVVideoBuffer *frame = [frameBuffers dequeue];
-    return (frame != nil);
-}
-
-- (BOOL)dequeueAudio
-{
-    OGVAudioBuffer *buffer = [audioBuffers dequeue];
-    return (buffer != nil);
-}
-
--(BOOL)decodeFrameWithBlock:(void (^)(OGVVideoBuffer *))block
+-(BOOL)decodeFrame
 {
     if ([frameBuffers peek]) {
-        block([frameBuffers dequeue]);
+        queuedFrame = [frameBuffers dequeue];
         return YES;
     } else {
         return NO;
     }
 }
 
--(BOOL)decodeAudioWithBlock:(void (^)(OGVAudioBuffer *))block
+-(BOOL)decodeAudio
 {
     if ([audioBuffers peek]) {
-        block([audioBuffers dequeue]);
+        queuedAudio = [audioBuffers dequeue];
         return YES;
     } else {
         return NO;
@@ -184,6 +173,16 @@
     return NO; // will block
 }
 
+- (OGVVideoBuffer *)frameBuffer
+{
+    return queuedFrame;
+}
+
+- (OGVAudioBuffer *)audioBuffer
+{
+    return queuedAudio;
+}
+
 -(void)dealloc
 {
 }
@@ -192,6 +191,8 @@
 {
     [frameBuffers flush];
     [audioBuffers flush];
+    queuedAudio = nil;
+    queuedFrame = nil;
 }
 
 - (BOOL)seek:(float)seconds
@@ -210,12 +211,6 @@
 
     [self flush];
     return YES;
-}
-
-- (float)findNextKeyframe
-{
-    // Not really keyframes anymore, so .... fake it.
-    return self.frameTimestamp;
 }
 
 #pragma mark - property getters

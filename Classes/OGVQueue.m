@@ -60,14 +60,4 @@
     return ([items count] == 0);
 }
 
-- (id)match:(BOOL(^)(id item))block
-{
-    for (id item in items) {
-        if (block(item)) {
-            return item;
-        }
-    }
-    return nil;
-}
-
 @end

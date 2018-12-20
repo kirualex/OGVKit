@@ -102,7 +102,7 @@
         if (bytesToRead > nBytes) {
             bytesToRead = nBytes;
         }
-        NSRange range = NSMakeRange((NSUInteger)self.bytePosition, (NSUInteger)bytesToRead);
+        NSRange range = NSMakeRange(self.bytePosition, bytesToRead);
         
         self.bytePosition += bytesToRead;
         return [self.data subdataWithRange:range];

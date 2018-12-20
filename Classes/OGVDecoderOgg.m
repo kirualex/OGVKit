@@ -15,7 +15,7 @@
 #include <oggz/oggz.h>
 
 #ifdef OGVKIT_HAVE_VORBIS_DECODER
-#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 #endif
 
 #ifdef OGVKIT_HAVE_THEORA_DECODER
@@ -122,6 +122,9 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
     int              theora_processing_headers;
 #endif
     
+    /* single frame video buffering */
+    OGVVideoBuffer *queuedFrame;
+    
     /* Audio decode state */
 #ifdef OGVKIT_HAVE_VORBIS_DECODER
     int              vorbis_processing_headers;
@@ -140,6 +143,7 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
     /* 120ms at 48000 */
 #define OPUS_MAX_FRAME_SIZE (960*6)
 #endif
+    OGVAudioBuffer *queuedAudio;
 
     enum AppState {
         STATE_BEGIN,
@@ -528,19 +532,14 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
     }
 }
 
-- (BOOL)dequeueFrame
-{
-    return nil != [videoPackets dequeue];
-}
-
-- (BOOL)dequeueAudio
-{
-    return nil != [audioPackets dequeue];
-}
-
-- (BOOL) decodeFrameWithBlock:(void (^)(OGVVideoBuffer *))block
+- (BOOL) decodeFrame
 {
     OGVDecoderOggPacket *packet = [videoPackets dequeue];
+
+    if (queuedFrame) {
+        [queuedFrame neuter];
+        queuedFrame = nil;
+    }
 
 #ifdef OGVKIT_HAVE_THEORA_DECODER
     if (videoCodec == OGGZ_CONTENT_THEORA) {
@@ -548,19 +547,8 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
         float videobuf_time = th_granule_time(theoraDecoderContext, videobuf_granulepos);
 
         int ret = th_decode_packetin(theoraDecoderContext, packet.oggPacket, nil);
-        if (ret == 0 || ret == TH_DUPFRAME) {
-            th_ycbcr_buffer ycbcr;
-            th_decode_ycbcr_out(theoraDecoderContext, ycbcr);
-            
-            OGVVideoBuffer *frame = [self.videoFormat createVideoBufferWithYBytes:ycbcr[0].data
-                                                                          YStride:ycbcr[0].stride
-                                                                          CbBytes:ycbcr[1].data
-                                                                         CbStride:ycbcr[1].stride
-                                                                          CrBytes:ycbcr[2].data
-                                                                         CrStride:ycbcr[2].stride
-                                                                        timestamp:videobuf_time];
-            block(frame);
-            [frame neuter];
+        if (ret == 0 || ret == TH_DUPFRAME){
+            [self doDecodeTheora:videobuf_time];
             return YES;
         } else {
             [OGVKit.singleton.logger errorWithFormat:@"Theora decoder failed mysteriously? %d", ret];
@@ -572,7 +560,23 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
     return NO;
 }
 
-- (BOOL)decodeAudioWithBlock:(void (^)(OGVAudioBuffer *))block
+#ifdef OGVKIT_HAVE_THEORA_DECODER
+-(void)doDecodeTheora:(float)timestamp
+{
+    th_ycbcr_buffer ycbcr;
+    th_decode_ycbcr_out(theoraDecoderContext, ycbcr);
+
+    queuedFrame = [self.videoFormat createVideoBufferWithYBytes:ycbcr[0].data
+                                                        YStride:ycbcr[0].stride
+                                                        CbBytes:ycbcr[1].data
+                                                       CbStride:ycbcr[1].stride
+                                                        CrBytes:ycbcr[2].data
+                                                       CrStride:ycbcr[2].stride
+                                                      timestamp:timestamp];
+}
+#endif
+
+- (BOOL)decodeAudio
 {
     OGVDecoderOggPacket *packet = [audioPackets dequeue];
 
@@ -588,7 +592,7 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
                 ogg_int64_t audiobuf_granulepos = packet.oggzPacket->pos.calc_granulepos;
                 float audiobuf_time = vorbis_granule_time(&vd, audiobuf_granulepos);
 
-                block([[OGVAudioBuffer alloc] initWithPCM:pcm samples:sampleCount format:self.audioFormat timestamp:audiobuf_time]);
+                queuedAudio = [[OGVAudioBuffer alloc] initWithPCM:pcm samples:sampleCount format:self.audioFormat timestamp:audiobuf_time];
                 vorbis_synthesis_read(&vd, sampleCount);
                 return YES;
             } else {
@@ -626,7 +630,7 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
             ogg_int64_t audiobuf_granulepos = packet.oggzPacket->pos.calc_granulepos;
             float audiobuf_time = (double)audiobuf_granulepos / 48000.0;
 
-            block([[OGVAudioBuffer alloc] initWithPCM:pcmJagged samples:sampleCount format:self.audioFormat timestamp:audiobuf_time]);
+            queuedAudio = [[OGVAudioBuffer alloc] initWithPCM:pcmJagged samples:sampleCount format:self.audioFormat timestamp:audiobuf_time];
 
             return YES;
         } else {
@@ -638,6 +642,16 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
 #endif /* OGVKIT_HAVE_OPUS_DECODER */
 
     return NO;
+}
+
+- (OGVVideoBuffer *)frameBuffer
+{
+    return queuedFrame;
+}
+
+- (OGVAudioBuffer *)audioBuffer
+{
+    return queuedAudio;
 }
 
 - (BOOL)process
@@ -675,7 +689,22 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
     }
 
     if (needData) {
-        return [self processNextPackets];
+        long ret = oggz_read(oggz, kOGVDecoderReadBufferSize);
+        if (ret > 0) {
+            // just chillin'
+            return 1;
+        } else if (ret == 0) {
+            // end of file
+            [OGVKit.singleton.logger debugWithFormat:@"END OF FILE from oggz_read?"];
+            return 0;
+        } else if (ret == OGGZ_ERR_STOP_OK) {
+            // we processed enough packets for now,
+            // but come back for more later please!
+            return 1;
+        } else {
+            [OGVKit.singleton.logger fatalWithFormat:@"Error from oggz_read? %ld", ret];
+            abort();
+        }
     } else if (self.inputStream.state == OGVInputStreamStateReading) {
         // nothing to do right now (??)
         return 1;
@@ -689,25 +718,6 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
     }
 }
 
-- (BOOL)processNextPackets
-{
-    long ret = oggz_read(oggz, kOGVDecoderReadBufferSize);
-    if (ret > 0) {
-        // just chillin'
-        return 1;
-    } else if (ret == 0) {
-        // end of file
-        [OGVKit.singleton.logger debugWithFormat:@"END OF FILE from oggz_read?"];
-        return 0;
-    } else if (ret == OGGZ_ERR_STOP_OK) {
-        // we processed enough packets for now,
-        // but come back for more later please!
-        return 1;
-    } else {
-        [OGVKit.singleton.logger fatalWithFormat:@"Error from oggz_read? %ld", ret];
-        abort();
-    }
-}
 
 - (void)dealloc
 {
@@ -749,10 +759,12 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
 -(void)flush
 {
     if (videoStream) {
+        queuedFrame = NULL;
         [videoPackets flush];
     }
 
     if (audioStream) {
+        queuedAudio = nil;
         [audioPackets flush];
 
 #ifdef OGVKIT_HAVE_VORBIS_DECODER
@@ -776,56 +788,7 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
     }
 }
 
-#ifdef OGVKIT_HAVE_THEORA_DECODER
-
-- (BOOL)theoraPacketIsKeyframe:(OGVDecoderOggPacket *)packet
-{
-    ogg_int64_t granulepos = packet.oggzPacket->pos.calc_granulepos;
-    int shift = theoraInfo.keyframe_granule_shift;
-    ogg_int64_t keyframe = granulepos >> shift;
-    ogg_int64_t index = granulepos ^ (keyframe << shift);
-    if (index == 0LL) {
-        // Found a keyframe, can start decoding.
-        return YES;
-    } else {
-        // Discard earlier frame, can't decode it.
-        return NO;
-    }
-}
-
-- (float)theoraTimestamp:(OGVDecoderOggPacket *)packet
-{
-    ogg_int64_t videobuf_granulepos = packet.oggzPacket->pos.calc_granulepos;
-    float videobuf_time = th_granule_time(theoraDecoderContext, videobuf_granulepos);
-    return videobuf_time;
-}
-#endif
-
-
-- (float)findNextKeyframe
-{
-#ifdef OGVKIT_HAVE_THEORA_DECODER
-    if (self.hasVideo) {
-        while (YES) {
-            OGVDecoderOggPacket *packet = [videoPackets match:^BOOL(OGVDecoderOggPacket *pkt) {
-                return [self theoraPacketIsKeyframe:pkt];
-            }];
-            if (packet) {
-                return [self theoraTimestamp:packet];
-            } else {
-                if ([self processNextPackets]) {
-                    continue;
-                } else {
-                    break;
-                }
-            }
-        }
-    }
-#endif
-    return INFINITY;
-}
-
--(BOOL)seekForwardToKeyframe
+-(void)seekForwardToKeyframe
 {
 #ifdef OGVKIT_HAVE_THEORA_DECODER
     // Discard any video frames prior to the next keyframe...
@@ -840,7 +803,11 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
             }
             OGVDecoderOggPacket *packet = [videoPackets peek];
             if (packet) {
-                if ([self theoraPacketIsKeyframe:packet]) {
+                ogg_int64_t granulepos = packet.oggzPacket->pos.calc_granulepos;
+                int shift = theoraInfo.keyframe_granule_shift;
+                ogg_int64_t keyframe = granulepos >> shift;
+                ogg_int64_t index = granulepos ^ (keyframe << shift);
+                if (index == 0LL) {
                     // Found a keyframe, can start decoding.
                     break;
                 } else {
@@ -849,16 +816,14 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
                 }
             }
         }
-        return YES;
-    }
-#endif
-    if (self.hasAudio && self.frameReady) {
-        // Discard any audio prior to the keyframe.
-        while (self.audioReady && self.audioTimestamp < self.frameTimestamp) {
-            [audioPackets dequeue];
+        if (self.hasAudio && self.frameReady) {
+            // Discard any audio prior to the keyframe.
+            while (self.audioReady && self.audioTimestamp < self.frameTimestamp) {
+                [audioPackets dequeue];
+            }
         }
     }
-    return NO;
+#endif
 }
 
 - (BOOL)seekViaSkeleton:(float)seconds
@@ -1009,7 +974,9 @@ static int readPacketCallback(OGGZ *oggz, oggz_packet *packet, long serialno, vo
 #ifdef OGVKIT_HAVE_THEORA_DECODER
     OGVDecoderOggPacket *packet = [videoPackets peek];
     if (packet) {
-        return [self theoraTimestamp:packet];
+        ogg_int64_t videobuf_granulepos = packet.oggzPacket->pos.calc_granulepos;
+        float videobuf_time = th_granule_time(theoraDecoderContext, videobuf_granulepos);
+        return videobuf_time;
     }
 #endif
     return -1;
