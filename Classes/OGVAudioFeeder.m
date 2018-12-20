@@ -292,6 +292,11 @@ static void OGVAudioFeederPropListener(void *data, AudioQueueRef queue, AudioQue
         assert(!isRunning);
         assert(samplesQueued >= nBuffers * bufferSize);
         
+        // Prevent error 560557684
+        if ([[AVAudioSession sharedInstance] isOtherAudioPlaying]) {
+            return;
+        }
+        
         isStarting = YES;
         
         [self changeAudioSessionCategory];
